@@ -19,7 +19,7 @@ SOEN 345 Cloud-based Ticket Reservation Application - Winter 2026
   
 
 ## Description
-A cloud-based event reservation platform designed to simplify how users discover and book tickets. Customers can register or log in, browse and search events across multiple categories, and reserve tickets through a structured and intuitive workflow. The system validates availability in real time, ensuring accurate reservations and preventing conflicts. Administrators manage events by adding, updating, or cancelling listings, while users receive automated confirmations and notifications. Together, these components create a reliable and user-friendly booking experience.
+A cloud-based event reservation platform designed to simplify how users discover and book tickets. Customers can register or log in, browse and search events across multiple categories, and reserve tickets through a structured and intuitive workflow. The system checks availability through real-time validation to create accurate reservations that prevent scheduling conflicts. Administrators manage events by adding, updating, or cancelling listings, while users receive automated confirmations and notifications. The system components work together to establish a dependable and easy-to-use booking system.
 
 ## Objective
 Our objective is to develop a user-friendly reservation platform that simplifies event discovery and ticket booking while providing reliable feedback, automated notifications, and a seamless user experience.
