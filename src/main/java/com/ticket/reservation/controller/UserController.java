@@ -22,9 +22,15 @@ public class UserController {
     }
 
     @PostMapping
-    @Operation(summary = "Register a new user")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        return ResponseEntity.ok(user);
+    @Operation(summary = "Register a new user by phone or email")
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            User savedUser = userService.createUser(user);
+            return ResponseEntity.ok(savedUser);
+        } catch (IllegalArgumentException e) {
+            // Return 400 Bad Request with error message
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }
