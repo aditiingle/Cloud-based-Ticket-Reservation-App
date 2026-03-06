@@ -21,12 +21,12 @@ public class ReservationApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        User u = new User("El", "el@email.com");
-        userService.createUser(u);
-
-        userService.getAllUsers().forEach(user ->
-                System.out.println(user.getName() + " - " + user.getEmail())
-        );
+//        User u = new User("El", "el@email.com");
+//        userService.createUser(u);
+//
+//        userService.getAllUsers().forEach(user ->
+//                System.out.println(user.getName() + " - " + user.getEmail())
+//        );
     }
 
 }

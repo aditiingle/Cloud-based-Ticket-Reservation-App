@@ -14,6 +14,19 @@ public class UserService {
     private UserRepository userRepository;
 
     public User createUser(User user) {
+        if ((user.getEmail() == null || user.getEmail().isEmpty()) &&
+                (user.getPhone() == null || user.getPhone().isEmpty())) {
+            throw new IllegalArgumentException("Email or phone must be provided.");
+        }
+
+        if (user.getEmail() != null && userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already registered.");
+        }
+
+        if (user.getPhone() != null && userRepository.findByPhone(user.getPhone()).isPresent()) {
+            throw new IllegalArgumentException("Phone number already registered.");
+        }
+
         return userRepository.save(user);
     }
 
