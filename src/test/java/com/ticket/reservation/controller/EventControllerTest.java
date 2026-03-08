@@ -22,4 +22,21 @@ class EventControllerTest {
         mockMvc.perform(get("/api/events/search?name=rock"))
                 .andExpect(status().isOk());
     }
+
+	@Test
+	void searchEventsByFilter_returns200() throws Exception {
+		EventService service = Mockito.mock(EventService.class);
+        EventController controller = new EventController(service);
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        mockMvc.perform(get("/api/events/search/category/concert"))
+                .andExpect(status().isOk());
+
+		mockMvc.perform(get("/api/events/search/location/montreal"))
+                .andExpect(status().isOk());
+		
+		mockMvc.perform(get("/api/events/search/date/1/1/1/1/1"))
+                .andExpect(status().isOk());
+	}
 }
