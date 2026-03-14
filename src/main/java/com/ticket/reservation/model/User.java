@@ -3,6 +3,7 @@ package com.ticket.reservation.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Document(collection = "User") // Name of the collection inside reservation DB
@@ -38,6 +39,7 @@ public class User {
     public String getPhone() { return phone; }
     public String getPassword() { return password; }
 
+    public void setId(String id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
     public void setPhone(String phone) { this.phone = phone; }
