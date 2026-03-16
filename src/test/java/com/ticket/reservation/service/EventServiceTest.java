@@ -1,13 +1,14 @@
 package com.ticket.reservation.service;
 
-import com.ticket.reservation.model.Event;
-import com.ticket.reservation.repository.EventRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.ticket.reservation.model.Event;
+import com.ticket.reservation.repository.EventRepository;
 
 class EventServiceTest {
 
@@ -58,4 +59,37 @@ class EventServiceTest {
         assertEquals(1, result.size());
         assertEquals("Rock Concert", result.get(0).getName());
     }
+
+	@Test
+	void searchEventsByFilter_returnsMatchingEvents() {
+		EventRepository repo = Mockito.mock(EventRepository.class);
+        EventService service = new EventService(repo);
+
+        Event event = new Event();
+        event.setName("Rock Concert");
+		event.setCategory("Concert");
+		event.setLocation("Montreal");
+		event.setDateTime(LocalDateTime.of(1, 1, 1, 1, 1, 1));
+
+        Mockito.when(repo.findByCategoryIgnoreCaseAndIsCancelledFalse("concert"))
+                .thenReturn(List.of(event));
+		Mockito.when(repo.findByLocationIgnoreCaseAndIsCancelledFalse("montreal"))
+                .thenReturn(List.of(event));
+		Mockito.when(repo.findByDateTimeAndIsCancelledFalse(LocalDateTime.of(1, 1, 1, 1, 1, 1)))
+                .thenReturn(List.of(event));
+
+
+        List<Event> result1 = service.searchEventsByCategory("concert");
+        List<Event> result2 = service.searchEventsByLocation("montreal");
+        List<Event> result3 = service.searchEventsByDateTime(LocalDateTime.of(1, 1, 1, 1, 1, 1));
+
+        assertEquals(1, result1.size());
+        assertEquals("Rock Concert", result1.get(0).getName());
+
+        assertEquals(1, result2.size());
+        assertEquals("Rock Concert", result2.get(0).getName());
+
+		assertEquals(1, result3.size());
+        assertEquals("Rock Concert", result3.get(0).getName());
+	}
 }
