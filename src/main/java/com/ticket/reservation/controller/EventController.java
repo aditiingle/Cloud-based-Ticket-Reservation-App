@@ -17,6 +17,11 @@ public class EventController {
         this.eventService = eventService;
     }
 
+    @GetMapping
+    public List<Event> getAllEvents() {
+        return eventService.getAllEvents();
+    }
+
     @GetMapping("/search")
     public List<Event> searchEvents(@RequestParam String name) {
         return eventService.searchEvents(name);

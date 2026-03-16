@@ -16,6 +16,10 @@ public class EventService {
         this.eventRepository = eventRepository;
     }
 
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
+    }
+
     public List<Event> searchEvents(String name) {
         return eventRepository.findByNameContainingIgnoreCaseAndIsCancelledFalse(name);
     }

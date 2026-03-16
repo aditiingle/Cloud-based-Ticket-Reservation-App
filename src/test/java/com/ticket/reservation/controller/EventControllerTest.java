@@ -12,6 +12,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class EventControllerTest {
 
     @Test
+    void getAllEvents_returns200() throws Exception {
+        EventService service = Mockito.mock(EventService.class);
+        EventController controller = new EventController(service);
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        mockMvc.perform(get("/api/events"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void searchEvents_returns200() throws Exception {
 
         EventService service = Mockito.mock(EventService.class);
