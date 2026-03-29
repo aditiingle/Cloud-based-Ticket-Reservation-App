@@ -2,6 +2,7 @@ package com.ticket.reservation.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -13,4 +14,6 @@ public interface EventRepository extends MongoRepository<Event, String> {
 	List<Event> findByCategoryIgnoreCaseAndIsCancelledFalse(String category);
 	List<Event> findByLocationIgnoreCaseAndIsCancelledFalse(String location);
 	List<Event> findByDateTimeBetweenAndIsCancelledFalse(LocalDateTime startOfDay, LocalDateTime endOfDay);
+	Optional<Event> findByName(String name);
+	Optional<Event> deleteByName(String name);
 }
