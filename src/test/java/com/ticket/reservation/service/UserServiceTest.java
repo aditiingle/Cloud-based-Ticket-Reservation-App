@@ -195,7 +195,6 @@ class UserServiceTest {
 
     @Test
     void login_invalidPassword_throwsException() {
-        String correctPassword = "correctPassword";
         String wrongPassword = "wrongPassword";
         String hashedPassword = "$2a$10$hashedPassword";
         User user = new User("Test User", "test@email.com", "1234567890", hashedPassword);
@@ -217,13 +216,13 @@ class UserServiceTest {
         User user = new User("Test User", "test@email.com", "1234567890", "hashedPassword");
         user.setId("user123");
 
-        when(jwtUtil.generateToken("user123", "test@email.com")).thenReturn("mockToken");
+        when(jwtUtil.generateToken(user)).thenReturn("mockToken");
 
         String token = userService.generateToken(user);
 
         assertNotNull(token);
         assertEquals("mockToken", token);
-        verify(jwtUtil, times(1)).generateToken("user123", "test@email.com");
+        verify(jwtUtil, times(1)).generateToken(user);
     }
 
     @Test
@@ -231,12 +230,12 @@ class UserServiceTest {
         User user = new User("Test User", null, "1234567890", "hashedPassword");
         user.setId("user123");
 
-        when(jwtUtil.generateToken("user123", "1234567890")).thenReturn("mockToken");
+        when(jwtUtil.generateToken(user)).thenReturn("mockToken");
 
         String token = userService.generateToken(user);
 
         assertNotNull(token);
         assertEquals("mockToken", token);
-        verify(jwtUtil, times(1)).generateToken("user123", "1234567890");
+        verify(jwtUtil, times(1)).generateToken(user);
     }
 }
