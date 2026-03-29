@@ -32,8 +32,6 @@ public class SecurityConfig {
                         // Public endpoints - no authentication required
                         .requestMatchers("/api/users").permitAll() // User registration
                         .requestMatchers("/api/users/login").permitAll() // User login
-                        .requestMatchers("/api/admin/register").permitAll()
-                        .requestMatchers("/api/admin/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Swagger
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
