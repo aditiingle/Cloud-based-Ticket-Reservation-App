@@ -11,6 +11,9 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.ticket.reservation.model.Administrator;
+import com.ticket.reservation.model.User;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -36,6 +39,27 @@ public class JwtUtil {
         return createToken(claims, email);
     }
     
+    /**
+     * Generates a JWT token with role information based on user type.
+     * @param user The user object (Administrator or Customer)
+     * @return JWT token string
+     */
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        String email = user.getEmail() != null ? user.getEmail() : user.getPhone();
+        claims.put("email", email);
+        
+        // Add role based on user type
+        if (user instanceof Administrator) {
+            claims.put("role", "ROLE_ADMIN");
+        } else {
+            claims.put("role", "ROLE_CUSTOMER");
+        }
+        
+        return createToken(claims, email);
+    }
+    
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)
@@ -52,6 +76,15 @@ public class JwtUtil {
     
     public String extractUserId(String token) {
         return extractClaim(token, claims -> claims.get("userId", String.class));
+    }
+    
+    /**
+     * Extracts the role from the JWT token.
+     * @param token The JWT token string
+     * @return The role string (e.g., "ROLE_ADMIN" or "ROLE_CUSTOMER")
+     */
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
     
     public Date extractExpiration(String token) {

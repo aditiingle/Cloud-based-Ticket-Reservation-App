@@ -1,13 +1,15 @@
 package com.ticket.reservation.config;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ticket.reservation.util.JwtUtil;
@@ -42,8 +44,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null && Boolean.TRUE.equals(jwtUtil.validateToken(token))) {
+            // Extract role from token and create authorities
+            String role = jwtUtil.extractRole(token);
+            SimpleGrantedAuthority authority;
+            
+            if (StringUtils.hasText(role)) {
+                authority = new SimpleGrantedAuthority(role);
+            } else {
+                // Default to CUSTOMER role if no role in token (backward compatibility)
+                authority = new SimpleGrantedAuthority("ROLE_CUSTOMER");
+            }
+            
             UsernamePasswordAuthenticationToken authentication = 
-                new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
+                new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(authority));
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

@@ -87,7 +87,6 @@ public class UserService {
     }
     
     public String generateToken(User user) {
-        String email = user.getEmail() != null ? user.getEmail() : user.getPhone();
-        return jwtUtil.generateToken(user.getId(), email);
+        return jwtUtil.generateToken(user);
     }
 }

@@ -12,5 +12,5 @@ public interface EventRepository extends MongoRepository<Event, String> {
     List<Event> findByNameContainingIgnoreCaseAndIsCancelledFalse(String name);
 	List<Event> findByCategoryIgnoreCaseAndIsCancelledFalse(String category);
 	List<Event> findByLocationIgnoreCaseAndIsCancelledFalse(String location);
-	List<Event> findByDateTimeAndIsCancelledFalse(LocalDateTime dateTime);
+	List<Event> findByDateTimeBetweenAndIsCancelledFalse(LocalDateTime startOfDay, LocalDateTime endOfDay);
 }
