@@ -34,3 +34,15 @@ build/
 
 .env
 .DS_Store
+
+# Android / Gradle (mobile module)
+mobile/.gradle/
+mobile/app/build/
+mobile/build/
+mobile/local.properties
+
+# Android Studio / IntelliJ module files inside mobile
+mobile/*.iml
+
+mobile/.gitignore
+mobile/app/.gitignore
