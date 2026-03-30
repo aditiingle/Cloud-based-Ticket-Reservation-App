@@ -16,6 +16,7 @@ import com.ticket.reservation.repository.ReservationRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
@@ -31,14 +32,16 @@ public class ReservationIntegrationTest {
     @Test
     public void testCreateReservation() {
         CreateReservationRequestDTO reservationDTO = new CreateReservationRequestDTO();
-        reservationDTO.setCustomerId("TEMP");
-        reservationDTO.setEventId("TEMP");
+        String userID = "69c98ecb31810e05e842a720";
+        String eventID = "69c9939414fdac0e8958544b";
+        reservationDTO.setCustomerId(userID);
+        reservationDTO.setEventId(eventID);
 
         ResponseEntity<?> response = reservationController.createReservation(reservationDTO);
         assertTrue(response.getStatusCode().isSameCodeAs(HttpStatus.OK));
-        assertTrue(reservationRepository.findByCustomerId("TEMP").size() > 0);
+        assertTrue(reservationRepository.findByCustomerId(userID).size() > 0);
 
-        Optional<Reservation> reservationOptional = reservationRepository.findByCustomerId("TEMP").stream().findFirst();
+        Optional<Reservation> reservationOptional = reservationRepository.findByCustomerId(userID).stream().findFirst();
         assertTrue(reservationOptional.isPresent());
 
         Reservation reservation = reservationOptional.get();
@@ -48,17 +51,15 @@ public class ReservationIntegrationTest {
 
     @Test
     public void testCancelReservation() {
-        CreateReservationRequestDTO reservationDTO = new CreateReservationRequestDTO();
-        reservationDTO.setCustomerId("TEMP");
-        reservationDTO.setEventId("TEMP");
+        String userID = "69c98ecb31810e05e842a720";
+        List<Reservation> reservations = reservationRepository.findByCustomerId(userID);
+        assertTrue(reservations.size() > 0);
+
+        String reservationID = reservations.get(0).getId();
 
         CancelReservationRequestDTO cancelDTO = new CancelReservationRequestDTO();
-        cancelDTO.setCustomerId("TEMP");
-        cancelDTO.setReservationId("TEMP");
-
-        ResponseEntity<?> createResponse = reservationController.createReservation(reservationDTO);
-        assertTrue(createResponse.getStatusCode().isSameCodeAs(HttpStatus.OK));
-        assertTrue(reservationRepository.findByCustomerId("TEMP").size() > 0);
+        cancelDTO.setCustomerId(userID);
+        cancelDTO.setReservationId(reservationID);
 
         ResponseEntity<?> cancelResponse = reservationController.cancelReservation(cancelDTO);
         assertTrue(cancelResponse.getStatusCode().isSameCodeAs(HttpStatus.OK));
