@@ -30,7 +30,7 @@ public class EventIntegrationTest {
     private EventRepository eventRepository;
 
     @Test
-    private void testAddEvent() {
+    public void testAddEvent() {
         EventRequestDTO eventDTO = new EventRequestDTO();
         eventDTO.setName("Test event");
         eventDTO.setCategory("Test category");
@@ -46,8 +46,10 @@ public class EventIntegrationTest {
     }
 
     @Test
-    private void testEditEvent() {
-        String id = "";
+    public void testEditEvent() {
+        Optional<Event> eventOptional = eventRepository.findByName("Edit test event");
+        assertTrue(eventOptional.isPresent());
+        String id = eventOptional.get().getId();
 
         EventRequestDTO eventDTO = new EventRequestDTO();
         eventDTO.setName("Edit test event");
