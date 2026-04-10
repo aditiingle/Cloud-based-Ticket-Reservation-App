@@ -25,4 +25,4 @@ RUN ./mvnw package -DskipTests
 EXPOSE 8080
 
 # Run the Spring Boot application
-CMD ["java", "-jar", "target/*.jar"]
+CMD java -jar target/*.jar
