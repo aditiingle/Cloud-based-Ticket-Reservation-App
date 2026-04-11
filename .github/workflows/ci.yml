@@ -43,3 +43,17 @@ jobs:
       - name: Display test results
         if: always()
         run: cat target/surefire-reports/*.txt || true
+
+      - name: Print Surefire reports
+        if: always()
+        run: |
+          find target/surefire-reports -type f -maxdepth 1 | sort
+          for f in target/surefire-reports/*.txt; do
+            echo "===== $f ====="
+            cat "$f"
+            echo
+          done
+      - name: Print XML report snippets
+        if: always()
+        run: |
+          grep -R "Caused by\|Exception\|Failed to load ApplicationContext" target/surefire-reports || true
