@@ -138,6 +138,55 @@ class UserServiceTest {
         verify(passwordEncoder, times(1)).encode(plainPassword);
     }
 
+    @Test
+    void getAllUsers_returnsAllUsers() {
+        User user1 = new User("User One", "one@email.com", "1111111111", "pw1");
+        User user2 = new User("User Two", "two@email.com", "2222222222", "pw2");
+
+        when(userRepository.findAll()).thenReturn(java.util.List.of(user1, user2));
+
+        var users = userService.getAllUsers();
+
+        assertNotNull(users);
+        assertEquals(2, users.size());
+        verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    void getUserById_found_returnsUser() {
+        User user = new User("Test User", "test@email.com", "1234567890", "pw");
+        user.setId("user123");
+
+        when(userRepository.findById("user123")).thenReturn(Optional.of(user));
+
+        User result = userService.getUserById("user123");
+
+        assertNotNull(result);
+        assertEquals("user123", result.getId());
+        assertEquals("Test User", result.getName());
+    }
+
+    @Test
+    void getUserById_notFound_returnsNull() {
+        when(userRepository.findById("missingId")).thenReturn(Optional.empty());
+
+        User result = userService.getUserById("missingId");
+
+        assertEquals(null, result);
+    }
+
+    @Test
+    void getUserByEmail_found_returnsUser() {
+        User user = new User("Test User", "test@email.com", "1234567890", "pw");
+
+        when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
+
+        User result = userService.getUserByEmail("test@email.com");
+
+        assertNotNull(result);
+        assertEquals("test@email.com", result.getEmail());
+    }
+
     // ==================== Login Tests ====================
 
     @Test
@@ -207,6 +256,36 @@ class UserServiceTest {
         });
 
         assertEquals("Invalid password.", exception.getMessage());
+    }
+
+    @Test
+    void createUser_missingPassword_throwsException() {
+        User user = new User("Test Name", "test@email.com", "1234567890", null);
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.createUser(user);
+        });
+
+        assertEquals("Password must be provided.", exception.getMessage());
+        verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    void createUser_emptyPassword_throwsException() {
+        User user = new User("Test Name", "test@email.com", "1234567890", "");
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.createUser(user);
+        });
+
+        assertEquals("Password must be provided.", exception.getMessage());
+        verify(userRepository, never()).save(user);
     }
 
     // ==================== Token Generation Tests ====================

@@ -10,6 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.ticket.reservation.dto.EventRequestDTO;
+import com.ticket.reservation.dto.EventResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -162,6 +165,20 @@ class EventServiceTest {
     }
 
     @Test
+    void save_callsRepositorySave() {
+        Event event = new Event();
+        event.setName("Saved Event");
+
+        when(eventRepository.save(event)).thenReturn(event);
+
+        Event result = eventService.save(event);
+
+        assertNotNull(result);
+        assertEquals("Saved Event", result.getName());
+        verify(eventRepository, times(1)).save(event);
+    }
+
+    @Test
     void editEvent_updatesEventAndSendsNotifications() {
         Event existingEvent = new Event();
         existingEvent.setId("event1");
@@ -232,6 +249,18 @@ class EventServiceTest {
     }
 
     @Test
+    void editEventFromDTO_throwsException_whenEventNotFound() {
+        EventRequestDTO dto = new EventRequestDTO();
+        dto.setName("Updated Name");
+
+        when(eventRepository.findById("missing")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventService.editEventFromDTO("missing", dto);
+        });
+    }
+
+    @Test
     void editEvent_throwsException_whenEventNotFound() {
         Event updatedEvent = new Event();
         updatedEvent.setName("New Name");
@@ -241,6 +270,74 @@ class EventServiceTest {
         assertThrows(IllegalArgumentException.class, () -> {
             eventService.editEvent("nonexistent", updatedEvent);
         });
+    }
+
+    @Test
+    void toEntity_mapsDtoToEvent() {
+        EventRequestDTO dto = new EventRequestDTO();
+        dto.setName("Concert");
+        dto.setCategory("Music");
+        dto.setDescription("Live concert");
+        dto.setLocation("Montreal");
+        dto.setDateTime(LocalDateTime.of(2026, 6, 15, 19, 0));
+        dto.setPrice(45.0);
+
+        Event event = eventService.toEntity(dto);
+
+        assertEquals("Concert", event.getName());
+        assertEquals("Music", event.getCategory());
+        assertEquals("Live concert", event.getDescription());
+        assertEquals("Montreal", event.getLocation());
+        assertEquals(45.0, event.getPrice());
+        assertEquals(LocalDateTime.of(2026, 6, 15, 19, 0), event.getDateTime());
+    }
+
+    @Test
+    void toResponseDTO_mapsEventToDto() {
+        Event event = new Event();
+        event.setId("event1");
+        event.setName("Concert");
+        event.setCategory("Music");
+        event.setDescription("Live concert");
+        event.setLocation("Montreal");
+        event.setDateTime(LocalDateTime.of(2026, 6, 15, 19, 0));
+        event.setPrice(45.0);
+        event.setCancelled(true);
+
+        EventResponseDTO dto = eventService.toResponseDTO(event);
+
+        assertEquals("event1", dto.getId());
+        assertEquals("Concert", dto.getName());
+        assertEquals("Music", dto.getCategory());
+        assertEquals("Live concert", dto.getDescription());
+        assertEquals("Montreal", dto.getLocation());
+        assertEquals(45.0, dto.getPrice());
+        assertTrue(dto.isCancelled());
+    }
+
+    @Test
+    void addEventFromDTO_createsAndReturnsResponseDTO() {
+        EventRequestDTO dto = new EventRequestDTO();
+        dto.setName("Concert");
+        dto.setCategory("Music");
+        dto.setDescription("Live concert");
+        dto.setLocation("Montreal");
+        dto.setDateTime(LocalDateTime.of(2026, 6, 15, 19, 0));
+        dto.setPrice(45.0);
+
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
+            Event event = invocation.getArgument(0);
+            event.setId("event1");
+            return event;
+        });
+
+        EventResponseDTO result = eventService.addEventFromDTO(dto);
+
+        assertNotNull(result);
+        assertEquals("event1", result.getId());
+        assertEquals("Concert", result.getName());
+        assertEquals("Music", result.getCategory());
+        assertFalse(result.isCancelled());
     }
 
     @Test
