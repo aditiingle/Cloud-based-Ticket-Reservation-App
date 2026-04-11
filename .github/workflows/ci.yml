@@ -17,6 +17,7 @@ jobs:
       MONGO_USER: ${{ secrets.MONGO_USER }}
       MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
       MONGO_CLUSTER: ${{ secrets.MONGO_CLUSTER }}
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
 
     steps:
       - name: Checkout repository
