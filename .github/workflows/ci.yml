@@ -10,14 +10,13 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
-    env: 
-      MONGO_DATABASE: ${{secrets.MONGO_DATABASE}}
-      MONGO_USER: ${{secrets.MONGO_USER}}
-      MONGO_PASSWORD: ${{secrets.MONGO_PASSWORD}}
-      MONGO_CLUSTER: ${{secrets.MONGO_CLUSTER}}
+    env:
+      MONGO_DATABASE: ${{ secrets.MONGO_DATABASE }}
+      MONGO_USER: ${{ secrets.MONGO_USER }}
+      MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+      MONGO_CLUSTER: ${{ secrets.MONGO_CLUSTER }}
 
     steps:
       - name: Checkout repository
@@ -41,10 +40,5 @@ jobs:
         run: mvn clean verify
 
       - name: Display test results
-        run: cat target/surefire-reports/*.txt || true
-
-      - name: Build and test
-        run: mvn clean test -X
-
-      - name: Print test reports
+        if: always()
         run: cat target/surefire-reports/*.txt || true
