@@ -20,6 +20,8 @@ import com.ticket.reservation.model.User;
 
 import java.util.List;
 
+import com.squareup.picasso.Picasso;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,7 +30,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
     private TextView tvEventName, tvEventDescription, tvEventLocation, tvEventDateTime, tvEventPrice, tvTopPrice, tvCategoryTag;
     private Button btnBookTicket, btnEditEvent, btnCancelEvent;
-    private ImageView btnBack;
+    private ImageView btnBack, ivEventImage;
     private ApiService apiService;
     private String eventId;
     private Event currentEvent;
@@ -56,6 +58,7 @@ public class EventDetailActivity extends AppCompatActivity {
         tvCategoryTag = findViewById(R.id.tvCategoryTag);
         btnBookTicket = findViewById(R.id.btnBookTicket);
         btnBack = findViewById(R.id.btnBack);
+        ivEventImage = findViewById(R.id.ivEventImage);
         btnEditEvent = findViewById(R.id.btnEditEvent);
         btnCancelEvent = findViewById(R.id.btnCancelEvent);
 
@@ -149,6 +152,12 @@ public class EventDetailActivity extends AppCompatActivity {
                     tvEventPrice.setText("$" + currentEvent.getPrice());
                     if (tvTopPrice != null) tvTopPrice.setText("$" + currentEvent.getPrice());
                     if (tvCategoryTag != null) tvCategoryTag.setText(currentEvent.getCategory() != null ? currentEvent.getCategory().toUpperCase() : "EVENT");
+
+                    if (ivEventImage != null) {
+                        String category = currentEvent.getCategory() != null ? currentEvent.getCategory().toLowerCase() : "event";
+                        String imageUrl = "https://loremflickr.com/800/400/" + category + "?lock=" + Math.abs(currentEvent.getId().hashCode());
+                        Picasso.get().load(imageUrl).into(ivEventImage);
+                    }
 
                     if (currentEvent.isCancelled()) {
                         btnBookTicket.setEnabled(false);

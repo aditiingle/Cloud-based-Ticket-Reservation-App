@@ -152,6 +152,12 @@
                     android:layout_height="match_parent"
                     android:background="#D1D5DB">
 
+                    <ImageView
+                        android:id="@+id/ivFeaturedImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
                     <!-- We'll assume a gradient or solid dark bottom text area -->
                     <View
                         android:layout_width="match_parent"

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ticket.reservation.model.Event;
 
 import java.util.List;
+
+import com.squareup.picasso.Picasso;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
@@ -49,6 +52,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.tvEventDateTime.setText(event.getDateTime());
         holder.tvEventPrice.setText("$" + event.getPrice());
 
+        String category = event.getCategory() != null ? event.getCategory().toLowerCase() : "event";
+        String imageUrl = "https://loremflickr.com/800/400/" + category + "?lock=" + Math.abs(event.getId().hashCode());
+
+        Picasso.get()
+                .load(imageUrl)
+                .fit()
+                .centerCrop()
+                .into(holder.ivEventImage);
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(event);
@@ -71,6 +83,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView tvEventLocation;
         TextView tvEventDateTime;
         TextView tvEventPrice;
+        ImageView ivEventImage;
 
         EventViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -79,6 +92,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             tvEventLocation = itemView.findViewById(R.id.tvEventLocation);
             tvEventDateTime = itemView.findViewById(R.id.tvEventDateTime);
             tvEventPrice = itemView.findViewById(R.id.tvEventPrice);
+            ivEventImage = itemView.findViewById(R.id.ivEventImage);
         }
     }
 }

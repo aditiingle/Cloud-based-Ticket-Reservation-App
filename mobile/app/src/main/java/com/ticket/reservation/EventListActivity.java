@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,8 @@ import com.ticket.reservation.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.squareup.picasso.Picasso;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,6 +39,7 @@ public class EventListActivity extends AppCompatActivity {
     private ApiService apiService;
     private TextView tvUserName, tvUserAvatar;
     private TextView tvFeaturedName, tvFeaturedLocation, tvFeaturedCategory;
+    private ImageView ivFeaturedImage;
     private TextView catAll, catConcert, catMovie, catSports, catTravel;
     private View btnAddEvent;
 
@@ -58,6 +62,7 @@ public class EventListActivity extends AppCompatActivity {
         tvFeaturedName = findViewById(R.id.tvFeaturedName);
         tvFeaturedLocation = findViewById(R.id.tvFeaturedLocation);
         tvFeaturedCategory = findViewById(R.id.tvFeaturedCategory);
+        ivFeaturedImage = findViewById(R.id.ivFeaturedImage);
 
         catAll = findViewById(R.id.catAll);
         catConcert = findViewById(R.id.catConcert);
@@ -206,6 +211,12 @@ public class EventListActivity extends AppCompatActivity {
             tvFeaturedName.setText(featured.getName());
             tvFeaturedLocation.setText(featured.getLocation());
             tvFeaturedCategory.setText(featured.getCategory() != null ? featured.getCategory().toUpperCase() : "EVENT");
+
+            if (ivFeaturedImage != null) {
+                String category = featured.getCategory() != null ? featured.getCategory().toLowerCase() : "event";
+                String imageUrl = "https://loremflickr.com/800/400/" + category + "?lock=" + Math.abs(featured.getId().hashCode());
+                Picasso.get().load(imageUrl).into(ivFeaturedImage);
+            }
         }
     }
 
