@@ -1,5 +1,6 @@
 package com.ticket.reservation;
 
+import com.ticket.reservation.model.CancelReservationRequest;
 import com.ticket.reservation.model.Event;
 import com.ticket.reservation.model.LoginRequest;
 import com.ticket.reservation.model.LoginResponse;
@@ -41,8 +42,14 @@ public interface ApiService {
     @GET("api/events/search/category")
     Call<List<Event>> searchEventsByCategory(@Header("Authorization") String authHeader, @Query("category") String category);
 
+    @GET("api/events/search/date")
+    Call<List<Event>> searchEventsByDate(@Header("Authorization") String authHeader, @Query("year") int year, @Query("month") int month, @Query("day") int day);
+
     @POST("api/reservations/reserve")
     Call<Object> reserveTicket(@Header("Authorization") String authHeader, @Body CreateReservationRequest request);
+
+    @POST("api/reservations/cancel")
+    Call<Reservation> cancelReservation(@Header("Authorization") String authHeader, @Body CancelReservationRequest request);
 
     @GET("api/users/me")
     Call<User> getUserProfile(@Header("Authorization") String authHeader);

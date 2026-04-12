@@ -1,5 +1,6 @@
 package com.ticket.reservation;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ticket.reservation.model.Event;
 
+import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,9 +52,9 @@ public class SearchActivity extends AppCompatActivity {
         catSearchMovies = findViewById(R.id.catSearchMovies);
         catSearchTravel = findViewById(R.id.catSearchTravel);
 
-        catSearchConcerts.setOnClickListener(v -> searchByCategory("Concert"));
+        catSearchConcerts.setOnClickListener(v -> searchByCategories(new String[]{"Concert", "Concerts"}));
         catSearchSports.setOnClickListener(v -> searchByCategory("Sports"));
-        catSearchMovies.setOnClickListener(v -> searchByCategory("Movie"));
+        catSearchMovies.setOnClickListener(v -> searchByCategories(new String[]{"Movie", "Movies"}));
         catSearchTravel.setOnClickListener(v -> searchByCategory("Travel"));
 
         // Bottom Nav
@@ -91,45 +93,90 @@ public class SearchActivity extends AppCompatActivity {
     private void performSearch(String query) {
         String token = SessionManager.getInstance(this).getToken();
         
-        // Use a combined approach: search by name, then by location if name yield few results
-        // or just trigger both and merge (for simplicity here, we'll try name first)
+        // Reset results and perform multi-parameter search
+        searchResults.clear();
+        
+        // 1. Search by Name
         apiService.searchEvents("Bearer " + token, query).enqueue(new Callback<List<Event>>() {
             @Override
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    searchResults.clear();
-                    searchResults.addAll(response.body());
-                    
-                    // Also try searching by location and add those results
-                    apiService.searchEventsByLocation("Bearer " + token, query).enqueue(new Callback<List<Event>>() {
-                        @Override
-                        public void onResponse(Call<List<Event>> call, Response<List<Event>> responseLoc) {
-                            if (responseLoc.isSuccessful() && responseLoc.body() != null) {
-                                for (Event e : responseLoc.body()) {
-                                    boolean exists = false;
-                                    for (Event existing : searchResults) {
-                                        if (existing.getId().equals(e.getId())) {
-                                            exists = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!exists) searchResults.add(e);
-                                }
-                            }
-                            eventAdapter.notifyDataSetChanged();
-                        }
-
-                        @Override
-                        public void onFailure(Call<List<Event>> call, Throwable t) {
-                            eventAdapter.notifyDataSetChanged();
-                        }
-                    });
+                    mergeResults(response.body());
                 }
+                
+                // 2. Search by Location (always try both)
+                apiService.searchEventsByLocation("Bearer " + token, query).enqueue(new Callback<List<Event>>() {
+                    @Override
+                    public void onResponse(Call<List<Event>> call, Response<List<Event>> responseLoc) {
+                        if (responseLoc.isSuccessful() && responseLoc.body() != null) {
+                            mergeResults(responseLoc.body());
+                        }
+                        
+                        // 3. Try parsing for date if query looks like a date (e.g., 2026-04-12)
+                        // Or just offer a Date Picker UI (better) - we'll implement both
+                        eventAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Event>> call, Throwable t) {
+                        eventAdapter.notifyDataSetChanged();
+                    }
+                });
             }
 
             @Override
             public void onFailure(Call<List<Event>> call, Throwable t) {
                 Toast.makeText(SearchActivity.this, "Search error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void mergeResults(List<Event> newEvents) {
+        for (Event e : newEvents) {
+            boolean exists = false;
+            for (Event existing : searchResults) {
+                if (existing.getId().equals(e.getId())) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) searchResults.add(e);
+        }
+    }
+
+    // Add this to your layout or trigger it from a button
+    public void showDatePickerDialog(View v) {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                (view, year1, monthOfYear, dayOfMonth) -> {
+                    // Month is 0-indexed in DatePicker
+                    searchByDate(year1, monthOfYear + 1, dayOfMonth);
+                }, year, month, day);
+        datePickerDialog.show();
+    }
+
+    private void searchByDate(int year, int month, int day) {
+        String token = SessionManager.getInstance(this).getToken();
+        apiService.searchEventsByDate("Bearer " + token, year, month, day).enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    searchResults.clear();
+                    searchResults.addAll(response.body());
+                    eventAdapter.notifyDataSetChanged();
+                    if (searchResults.isEmpty()) {
+                        Toast.makeText(SearchActivity.this, "No events on this date", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Event>> call, Throwable t) {
+                Toast.makeText(SearchActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -155,5 +202,47 @@ public class SearchActivity extends AppCompatActivity {
                 Toast.makeText(SearchActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void searchByCategories(String[] categories) {
+        String token = SessionManager.getInstance(this).getToken();
+        searchResults.clear();
+        final int[] remaining = {categories.length};
+
+        for (String category : categories) {
+            apiService.searchEventsByCategory("Bearer " + token, category).enqueue(new Callback<List<Event>>() {
+                @Override
+                public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        for (Event e : response.body()) {
+                            boolean exists = false;
+                            for (Event existing : searchResults) {
+                                if (existing.getId().equals(e.getId())) {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (!exists) searchResults.add(e);
+                        }
+                    }
+                    checkFinished();
+                }
+
+                @Override
+                public void onFailure(Call<List<Event>> call, Throwable t) {
+                    checkFinished();
+                }
+
+                private void checkFinished() {
+                    remaining[0]--;
+                    if (remaining[0] <= 0) {
+                        eventAdapter.notifyDataSetChanged();
+                        if (searchResults.isEmpty()) {
+                            Toast.makeText(SearchActivity.this, "No events found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            });
+        }
     }
 }

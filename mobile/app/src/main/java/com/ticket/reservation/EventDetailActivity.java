@@ -11,7 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.ticket.reservation.model.CreateReservationRequest;
 import com.ticket.reservation.model.Event;
+import com.ticket.reservation.model.Reservation;
 import com.ticket.reservation.model.User;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,6 +48,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
         if (eventId != null) {
             fetchEventDetails();
+            checkExistingReservation();
         }
 
         btnBookTicket.setOnClickListener(v -> bookTicket());
@@ -52,6 +56,40 @@ public class EventDetailActivity extends AppCompatActivity {
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());
         }
+    }
+
+    private void checkExistingReservation() {
+        String token = SessionManager.getInstance(this).getToken();
+        if (token == null || token.isEmpty()) return;
+
+        apiService.getUserProfile("Bearer " + token).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String customerId = response.body().getId();
+                    apiService.getUserReservations("Bearer " + token, customerId).enqueue(new Callback<List<Reservation>>() {
+                        @Override
+                        public void onResponse(Call<List<Reservation>> call, Response<List<Reservation>> responseRes) {
+                            if (responseRes.isSuccessful() && responseRes.body() != null) {
+                                for (Reservation res : responseRes.body()) {
+                                    if (eventId.equals(res.getEventId()) && !"CANCELLED".equals(res.getStatus())) {
+                                        btnBookTicket.setEnabled(false);
+                                        btnBookTicket.setText("Already Reserved");
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Reservation>> call, Throwable t) {}
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {}
+        });
     }
 
     private void fetchEventDetails() {

@@ -149,7 +149,7 @@
                     android:layout_marginTop="8dp"
                     app:layout_constraintTop_toBottomOf="@id/tvAboutLabel" />
 
-                <!-- Select Quantity placeholder -->
+                <!-- Select Quantity disabled as per backend constraints -->
                 <TextView
                     android:id="@+id/tvQuantityLabel"
                     android:layout_width="wrap_content"
@@ -159,6 +159,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginTop="24dp"
+                    android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@id/tvEventDescription"
                     app:layout_constraintStart_toStartOf="parent" />
 
@@ -170,6 +171,7 @@
                     android:background="@drawable/bg_category"
                     android:layout_marginTop="12dp"
                     android:padding="4dp"
+                    android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@id/tvQuantityLabel"
                     app:layout_constraintStart_toStartOf="parent">
                     <TextView
@@ -197,13 +199,14 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tvTicketsRemaining"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="120 tickets remaining"
+                    android:text="Reservations are limited to one ticket per transaction."
                     android:textColor="#9B9EAC"
                     android:textSize="12sp"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/llQuantity"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvEventDescription"
                     app:layout_constraintStart_toStartOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,9 +6,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ticket.reservation.model.CancelReservationRequest;
 import com.ticket.reservation.model.Reservation;
 import com.ticket.reservation.model.User;
 
@@ -34,7 +36,7 @@ public class MyTicketsActivity extends AppCompatActivity {
         recyclerViewTickets = findViewById(R.id.recyclerViewTickets);
         recyclerViewTickets.setLayoutManager(new LinearLayoutManager(this));
 
-        ticketAdapter = new TicketAdapter(tickets);
+        ticketAdapter = new TicketAdapter(tickets, this::showCancelConfirmation);
         recyclerViewTickets.setAdapter(ticketAdapter);
 
         apiService = RetrofitClient.getApiService();
@@ -94,6 +96,39 @@ public class MyTicketsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Reservation>> call, Throwable t) {
+                Toast.makeText(MyTicketsActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void showCancelConfirmation(Reservation reservation) {
+        new AlertDialog.Builder(this)
+                .setTitle("Cancel Ticket")
+                .setMessage("Are you sure you want to cancel this reservation?")
+                .setPositiveButton("Yes, Cancel", (dialog, which) -> cancelTicket(reservation))
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void cancelTicket(Reservation reservation) {
+        String token = SessionManager.getInstance(this).getToken();
+        if (token == null || token.isEmpty()) return;
+
+        CancelReservationRequest request = new CancelReservationRequest(reservation.getCustomerId(), reservation.getId());
+
+        apiService.cancelReservation("Bearer " + token, request).enqueue(new Callback<Reservation>() {
+            @Override
+            public void onResponse(Call<Reservation> call, Response<Reservation> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(MyTicketsActivity.this, "Ticket cancelled successfully", Toast.LENGTH_SHORT).show();
+                    fetchMyTickets(); // Refresh list
+                } else {
+                    Toast.makeText(MyTicketsActivity.this, "Failed to cancel: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Reservation> call, Throwable t) {
                 Toast.makeText(MyTicketsActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

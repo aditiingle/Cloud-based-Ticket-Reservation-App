@@ -33,7 +33,7 @@ public class EventListActivity extends AppCompatActivity {
     private ApiService apiService;
     private TextView tvUserName, tvUserAvatar;
     private TextView tvFeaturedName, tvFeaturedLocation, tvFeaturedCategory;
-    private TextView catAll, catConcert, catMovie, catSports;
+    private TextView catAll, catConcert, catMovie, catSports, catTravel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +50,13 @@ public class EventListActivity extends AppCompatActivity {
         catConcert = findViewById(R.id.catConcert);
         catMovie = findViewById(R.id.catMovie);
         catSports = findViewById(R.id.catSports);
+        catTravel = findViewById(R.id.catTravel);
 
         catAll.setOnClickListener(v -> filterByCategory("All"));
         catConcert.setOnClickListener(v -> filterByCategory("Concert"));
         catMovie.setOnClickListener(v -> filterByCategory("Movie"));
         catSports.setOnClickListener(v -> filterByCategory("Sports"));
+        catTravel.setOnClickListener(v -> filterByCategory("Travel"));
 
         // Buttons for navigation (using IDs from layout_bottom_nav included in activity_event_list)
         View btnSearch = findViewById(R.id.btnGoToSearch);
@@ -135,7 +137,12 @@ public class EventListActivity extends AppCompatActivity {
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     allEvents.clear();
-                    allEvents.addAll(response.body());
+                    for (Event event : response.body()) {
+                        Log.d("EventListActivity", "Event: " + event.getName() + " | Cancelled: " + event.isCancelled());
+                        if (!event.isCancelled()) {
+                            allEvents.add(event);
+                        }
+                    }
                     updateFeaturedEvent();
                     filterByCategory("All");
 
@@ -171,7 +178,19 @@ public class EventListActivity extends AppCompatActivity {
             filteredEvents.addAll(allEvents);
         } else {
             for (Event e : allEvents) {
-                if (e.getCategory() != null && e.getCategory().equalsIgnoreCase(category)) {
+                String eventCat = e.getCategory();
+                if (eventCat == null) continue;
+
+                boolean matches = false;
+                if (category.equals("Concert")) {
+                    matches = eventCat.equalsIgnoreCase("Concert") || eventCat.equalsIgnoreCase("Concerts");
+                } else if (category.equals("Movie")) {
+                    matches = eventCat.equalsIgnoreCase("Movie") || eventCat.equalsIgnoreCase("Movies");
+                } else {
+                    matches = eventCat.equalsIgnoreCase(category);
+                }
+
+                if (matches) {
                     filteredEvents.add(e);
                 }
             }
@@ -199,5 +218,8 @@ public class EventListActivity extends AppCompatActivity {
 
         catSports.setBackgroundResource(selectedCategory.equals("Sports") ? selectedBg : unselectedBg);
         catSports.setTextColor(selectedCategory.equals("Sports") ? selectedText : unselectedText);
+
+        catTravel.setBackgroundResource(selectedCategory.equals("Travel") ? selectedBg : unselectedBg);
+        catTravel.setTextColor(selectedCategory.equals("Travel") ? selectedText : unselectedText);
     }
 }
