@@ -9,6 +9,8 @@ import com.ticket.reservation.model.Event;
 import com.ticket.reservation.model.Notification;
 import com.ticket.reservation.model.User;
 import com.ticket.reservation.repository.NotificationRepository;
+import org.springframework.scheduling.annotation.Async;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class NotificationService {
@@ -126,5 +128,21 @@ public class NotificationService {
                 + ", Event: " + eventName
                 + ", Location: " + location
                 + ", Date/Time: " + dateTime;
+    }
+
+    @Async
+    public CompletableFuture<Void> sendBookingConfirmationAsync(String reservationId, Event event, User user) {
+        Notification notification = sendBookingConfirmation(reservationId, event);
+        sendEmail(user, notification);
+        sendSMS(user, notification);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async
+    public CompletableFuture<Void> sendCancellationNotificationAsync(String reservationId, Event event, User user) {
+        Notification notification = sendCancellationNotification(reservationId, event);
+        sendEmail(user, notification);
+        sendSMS(user, notification);
+        return CompletableFuture.completedFuture(null);
     }
 }

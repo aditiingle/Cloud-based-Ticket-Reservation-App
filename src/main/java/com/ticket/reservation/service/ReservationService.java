@@ -56,9 +56,7 @@ public class ReservationService {
         );
         ticketRepository.save(ticket);
 
-        Notification notification = notificationService.sendBookingConfirmation(savedReservation.getId(), event);
-        notificationService.sendEmail(user, notification);
-        notificationService.sendSMS(user, notification);
+        notificationService.sendBookingConfirmationAsync(savedReservation.getId(), event, user);
 
         return savedReservation;
     }
@@ -79,10 +77,8 @@ public class ReservationService {
         if (ticket != null) {
             Event event = eventRepository.findById(ticket.getEventId()).orElse(null);
             if (event != null) {
-                Notification notification = notificationService.sendCancellationNotification(reservationId, event);
                 User user = userRepository.findById(customerId).orElse(null);
-                notificationService.sendEmail(user, notification);
-                notificationService.sendSMS(user, notification);
+                notificationService.sendCancellationNotificationAsync(reservationId, event, user);
             }
         }
 
