@@ -47,7 +47,7 @@ public class EventService {
     }
 
     public List<Event> searchEventsByLocation(String location) {
-        return eventRepository.findByLocationIgnoreCaseAndIsCancelledFalse(location);
+        return eventRepository.findByLocationContainingIgnoreCaseAndIsCancelledFalse(location);
     }
 
     public List<Event> searchEventsByDate(LocalDate date) {
