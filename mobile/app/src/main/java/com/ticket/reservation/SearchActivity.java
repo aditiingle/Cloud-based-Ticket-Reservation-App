@@ -11,6 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,6 +40,15 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        View mainView = findViewById(R.id.main);
+        if (mainView != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+        }
 
         etSearch = findViewById(R.id.etSearch);
         recyclerViewSearch = findViewById(R.id.recyclerViewSearch);
@@ -111,9 +123,6 @@ public class SearchActivity extends AppCompatActivity {
                         if (responseLoc.isSuccessful() && responseLoc.body() != null) {
                             mergeResults(responseLoc.body());
                         }
-                        
-                        // 3. Try parsing for date if query looks like a date (e.g., 2026-04-12)
-                        // Or just offer a Date Picker UI (better) - we'll implement both
                         eventAdapter.notifyDataSetChanged();
                     }
 
@@ -144,7 +153,6 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-    // Add this to your layout or trigger it from a button
     public void showDatePickerDialog(View v) {
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);

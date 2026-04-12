@@ -86,7 +86,9 @@
         android:textColor="#161C2D"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/imgContainer"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvEventDateTime"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/tvEventCategory" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

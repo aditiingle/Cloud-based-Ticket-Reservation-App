@@ -3,14 +3,17 @@ package com.ticket.reservation;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,6 +43,15 @@ public class EventListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_list);
+
+        View mainView = findViewById(R.id.main);
+        if (mainView != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+        }
 
         tvUserName = findViewById(R.id.tvUserName);
         tvUserAvatar = findViewById(R.id.tvUserAvatar);
@@ -85,6 +97,14 @@ public class EventListActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, AddEditEventActivity.class);
                 startActivity(intent);
             });
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (apiService != null) {
+            fetchEvents();
         }
     }
 
