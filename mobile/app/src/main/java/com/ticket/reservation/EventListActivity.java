@@ -34,6 +34,7 @@ public class EventListActivity extends AppCompatActivity {
     private TextView tvUserName, tvUserAvatar;
     private TextView tvFeaturedName, tvFeaturedLocation, tvFeaturedCategory;
     private TextView catAll, catConcert, catMovie, catSports, catTravel;
+    private View btnAddEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,7 @@ public class EventListActivity extends AppCompatActivity {
         catMovie = findViewById(R.id.catMovie);
         catSports = findViewById(R.id.catSports);
         catTravel = findViewById(R.id.catTravel);
+        btnAddEvent = findViewById(R.id.btnAddEvent);
 
         catAll.setOnClickListener(v -> filterByCategory("All"));
         catConcert.setOnClickListener(v -> filterByCategory("Concert"));
@@ -77,6 +79,13 @@ public class EventListActivity extends AppCompatActivity {
         apiService = RetrofitClient.getApiService();
         fetchEvents();
         fetchUserProfile();
+
+        if (btnAddEvent != null) {
+            btnAddEvent.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AddEditEventActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     @Override
@@ -110,9 +119,17 @@ public class EventListActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String name = response.body().getName();
+                    String email = response.body().getEmail();
                     if (name != null && !name.isEmpty()) {
                         tvUserName.setText(name + " \uD83D\uDC4B");
                         tvUserAvatar.setText(name.substring(0, 1).toUpperCase());
+                    }
+                    
+                    // Simple admin check based on email for this demo
+                    if (email != null && email.contains("admin")) {
+                        if (btnAddEvent != null) btnAddEvent.setVisibility(View.VISIBLE);
+                    } else {
+                        if (btnAddEvent != null) btnAddEvent.setVisibility(View.GONE);
                     }
                 }
             }

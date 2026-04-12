@@ -2,6 +2,7 @@ package com.ticket.reservation;
 
 import com.ticket.reservation.model.CancelReservationRequest;
 import com.ticket.reservation.model.Event;
+import com.ticket.reservation.model.EventRequest;
 import com.ticket.reservation.model.LoginRequest;
 import com.ticket.reservation.model.LoginResponse;
 import com.ticket.reservation.model.CreateReservationRequest;
@@ -15,7 +16,9 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -44,6 +47,15 @@ public interface ApiService {
 
     @GET("api/events/search/date")
     Call<List<Event>> searchEventsByDate(@Header("Authorization") String authHeader, @Query("year") int year, @Query("month") int month, @Query("day") int day);
+
+    @POST("api/events")
+    Call<Void> addEvent(@Header("Authorization") String authHeader, @Body EventRequest request);
+
+    @PUT("api/events/{id}")
+    Call<Void> editEvent(@Header("Authorization") String authHeader, @Path("id") String id, @Body EventRequest request);
+
+    @PATCH("api/events/{id}/cancel")
+    Call<Void> cancelEvent(@Header("Authorization") String authHeader, @Path("id") String id);
 
     @POST("api/reservations/reserve")
     Call<Object> reserveTicket(@Header("Authorization") String authHeader, @Body CreateReservationRequest request);

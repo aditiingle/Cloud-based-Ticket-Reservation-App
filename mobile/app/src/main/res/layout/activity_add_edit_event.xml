@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:layout_marginTop="100dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_avatar"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    app:tint="#161C2D"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="Back" />
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add/Edit Event"
+                    android:textColor="#161C2D"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etEventName"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_rounded_input"
+                android:hint="Event Name"
+                android:paddingHorizontal="16dp"
+                android:textColor="#161C2D"
+                android:textColorHint="#9B9EAC"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etEventCategory"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_rounded_input"
+                android:hint="Category (Concert, Movie, etc.)"
+                android:paddingHorizontal="16dp"
+                android:textColor="#161C2D"
+                android:textColorHint="#9B9EAC"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etEventLocation"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_rounded_input"
+                android:hint="Location"
+                android:paddingHorizontal="16dp"
+                android:textColor="#161C2D"
+                android:textColorHint="#9B9EAC"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etEventPrice"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_rounded_input"
+                android:hint="Price"
+                android:inputType="numberDecimal"
+                android:paddingHorizontal="16dp"
+                android:textColor="#161C2D"
+                android:textColorHint="#9B9EAC"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
+
+                <EditText
+                    android:id="@+id/etEventDate"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_rounded_input"
+                    android:hint="Date (YYYY-MM-DD)"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="#161C2D"
+                    android:textColorHint="#9B9EAC"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <EditText
+                    android:id="@+id/etEventTime"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_rounded_input"
+                    android:hint="Time (HH:MM)"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="#161C2D"
+                    android:textColorHint="#9B9EAC"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etEventDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_rounded_input"
+                android:gravity="top"
+                android:hint="Description"
+                android:minLines="5"
+                android:padding="16dp"
+                android:textColor="#161C2D"
+                android:textColorHint="#9B9EAC"
+                android:textSize="14sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSaveEvent"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/bg_rounded_button"
+                android:text="Save Event"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

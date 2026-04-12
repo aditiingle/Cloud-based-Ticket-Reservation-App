@@ -1,5 +1,6 @@
 package com.ticket.reservation;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,10 +24,11 @@ import retrofit2.Response;
 public class EventDetailActivity extends AppCompatActivity {
 
     private TextView tvEventName, tvEventDescription, tvEventLocation, tvEventDateTime, tvEventPrice, tvTopPrice, tvCategoryTag;
-    private Button btnBookTicket;
+    private Button btnBookTicket, btnEditEvent, btnCancelEvent;
     private ImageView btnBack;
     private ApiService apiService;
     private String eventId;
+    private Event currentEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,8 @@ public class EventDetailActivity extends AppCompatActivity {
         tvCategoryTag = findViewById(R.id.tvCategoryTag);
         btnBookTicket = findViewById(R.id.btnBookTicket);
         btnBack = findViewById(R.id.btnBack);
+        btnEditEvent = findViewById(R.id.btnEditEvent);
+        btnCancelEvent = findViewById(R.id.btnCancelEvent);
 
         apiService = RetrofitClient.getApiService();
         eventId = getIntent().getStringExtra("EVENT_ID");
@@ -52,6 +56,20 @@ public class EventDetailActivity extends AppCompatActivity {
         }
 
         btnBookTicket.setOnClickListener(v -> bookTicket());
+
+        if (btnEditEvent != null) {
+            btnEditEvent.setOnClickListener(v -> {
+                if (currentEvent != null) {
+                    Intent intent = new Intent(this, AddEditEventActivity.class);
+                    intent.putExtra("EVENT_ID", currentEvent.getId());
+                    startActivity(intent);
+                }
+            });
+        }
+
+        if (btnCancelEvent != null) {
+            btnCancelEvent.setOnClickListener(v -> cancelEvent());
+        }
 
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());
@@ -67,6 +85,19 @@ public class EventDetailActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String customerId = response.body().getId();
+                    String email = response.body().getEmail();
+
+                    // Admin check
+                    if (email != null && email.contains("admin")) {
+                        if (btnEditEvent != null) btnEditEvent.setVisibility(View.VISIBLE);
+                        if (btnCancelEvent != null) btnCancelEvent.setVisibility(View.VISIBLE);
+                        btnBookTicket.setVisibility(View.GONE);
+                    } else {
+                        if (btnEditEvent != null) btnEditEvent.setVisibility(View.GONE);
+                        if (btnCancelEvent != null) btnCancelEvent.setVisibility(View.GONE);
+                        btnBookTicket.setVisibility(View.VISIBLE);
+                    }
+
                     apiService.getUserReservations("Bearer " + token, customerId).enqueue(new Callback<List<Reservation>>() {
                         @Override
                         public void onResponse(Call<List<Reservation>> call, Response<List<Reservation>> responseRes) {
@@ -98,14 +129,20 @@ public class EventDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Event> call, Response<Event> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Event event = response.body();
-                    tvEventName.setText(event.getName());
-                    tvEventDescription.setText(event.getDescription());
-                    tvEventLocation.setText(event.getLocation());
-                    tvEventDateTime.setText(event.getDateTime() != null ? event.getDateTime().toString() : "");
-                    tvEventPrice.setText("$" + event.getPrice());
-                    if (tvTopPrice != null) tvTopPrice.setText("$" + event.getPrice());
-                    if (tvCategoryTag != null) tvCategoryTag.setText(event.getCategory() != null ? event.getCategory().toUpperCase() : "EVENT");
+                    currentEvent = response.body();
+                    tvEventName.setText(currentEvent.getName());
+                    tvEventDescription.setText(currentEvent.getDescription());
+                    tvEventLocation.setText(currentEvent.getLocation());
+                    tvEventDateTime.setText(currentEvent.getDateTime() != null ? currentEvent.getDateTime().toString() : "");
+                    tvEventPrice.setText("$" + currentEvent.getPrice());
+                    if (tvTopPrice != null) tvTopPrice.setText("$" + currentEvent.getPrice());
+                    if (tvCategoryTag != null) tvCategoryTag.setText(currentEvent.getCategory() != null ? currentEvent.getCategory().toUpperCase() : "EVENT");
+
+                    if (currentEvent.isCancelled()) {
+                        btnBookTicket.setEnabled(false);
+                        btnBookTicket.setText("Event Cancelled");
+                        if (btnCancelEvent != null) btnCancelEvent.setVisibility(View.GONE);
+                    }
                 } else {
                     Toast.makeText(EventDetailActivity.this, "Failed to load event details", Toast.LENGTH_SHORT).show();
                 }
@@ -159,6 +196,26 @@ public class EventDetailActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
+                Toast.makeText(EventDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void cancelEvent() {
+        String token = SessionManager.getInstance(this).getToken();
+        apiService.cancelEvent("Bearer " + token, eventId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(EventDetailActivity.this, "Event cancelled", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(EventDetailActivity.this, "Failed to cancel event", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(EventDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
