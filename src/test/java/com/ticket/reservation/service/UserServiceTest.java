@@ -101,6 +101,41 @@ class UserServiceTest {
     }
 
     @Test
+    void createUser_success_withEmailOnly() {
+        User user = new User("User", "user@email.com", null, "password123");
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("password123")).thenReturn("hashedPassword");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User result = userService.createUser(user);
+
+        assertNotNull(result);
+        assertEquals("user@email.com", result.getEmail());
+        assertEquals(null, result.getPhone());
+        assertEquals("hashedPassword", result.getPassword());
+
+        verify(userRepository, times(1)).findByEmail("user@email.com");
+        verify(userRepository, never()).findByPhone(anyString());
+    }
+
+    @Test
+    void createUser_emptyEmail_butValidPhone_success() {
+        User user = new User("User", "", "1234567890", "password123");
+
+        when(userRepository.findByEmail("")).thenReturn(Optional.empty());
+        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("password123")).thenReturn("hashedPassword");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User result = userService.createUser(user);
+
+        assertNotNull(result);
+        assertEquals("", result.getEmail());
+        assertEquals("1234567890", result.getPhone());
+    }
+
+    @Test
     void createUser_missingEmailAndPhone_throwsException() {
 
         // Arrange: user has neither email nor phone
@@ -113,6 +148,21 @@ class UserServiceTest {
 
         //Assert
         assertEquals("Email or phone must be provided.", exception.getMessage());
+        verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    void createUser_missingPassword_throwsException() {
+        User user = new User("Test Name", "test@email.com", "1234567890", null);
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.createUser(user);
+        });
+
+        assertEquals("Password must be provided.", exception.getMessage());
         verify(userRepository, never()).save(user);
     }
 
@@ -259,33 +309,21 @@ class UserServiceTest {
     }
 
     @Test
-    void createUser_missingPassword_throwsException() {
-        User user = new User("Test Name", "test@email.com", "1234567890", null);
+    void login_invalidPassword_afterPhoneLookup_throwsException() {
+        String wrongPassword = "wrongPassword";
+        String hashedPassword = "$2a$10$hashedPassword";
 
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-        when(userRepository.findByPhone(user.getPhone())).thenReturn(Optional.empty());
+        User user = new User("User", null, "1234567890", hashedPassword);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            userService.createUser(user);
+        when(userRepository.findByEmail("1234567890")).thenReturn(Optional.empty());
+        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(wrongPassword, hashedPassword)).thenReturn(false);
+
+        Exception exception = assertThrows(AuthenticationException.class, () -> {
+            userService.login("1234567890", wrongPassword);
         });
 
-        assertEquals("Password must be provided.", exception.getMessage());
-        verify(userRepository, never()).save(user);
-    }
-
-    @Test
-    void createUser_emptyPassword_throwsException() {
-        User user = new User("Test Name", "test@email.com", "1234567890", "");
-
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-        when(userRepository.findByPhone(user.getPhone())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            userService.createUser(user);
-        });
-
-        assertEquals("Password must be provided.", exception.getMessage());
-        verify(userRepository, never()).save(user);
+        assertEquals("Invalid password.", exception.getMessage());
     }
 
     // ==================== Token Generation Tests ====================
@@ -316,5 +354,11 @@ class UserServiceTest {
         assertNotNull(token);
         assertEquals("mockToken", token);
         verify(jwtUtil, times(1)).generateToken(user);
+    }
+
+    @Test
+    void deleteUser_callsRepositoryDelete() {
+        userService.deleteUser("user123");
+        verify(userRepository, times(1)).deleteById("user123");
     }
 }

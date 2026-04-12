@@ -293,6 +293,33 @@ class EventServiceTest {
     }
 
     @Test
+    void editEventFromDTO_updatesEventAndReturnsResponseDTO() {
+        Event existingEvent = new Event();
+        existingEvent.setId("event1");
+        existingEvent.setName("Old Name");
+
+        EventRequestDTO dto = new EventRequestDTO();
+        dto.setName("Updated Name");
+        dto.setCategory("Updated Category");
+        dto.setDescription("Updated Description");
+        dto.setLocation("Updated Location");
+        dto.setDateTime(LocalDateTime.now().plusDays(3));
+        dto.setPrice(90.0);
+
+        when(eventRepository.findById("event1")).thenReturn(Optional.of(existingEvent));
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(ticketRepository.findByEventId("event1")).thenReturn(List.of());
+
+        EventResponseDTO result = eventService.editEventFromDTO("event1", dto);
+
+        assertNotNull(result);
+        assertEquals("Updated Name", result.getName());
+        assertEquals("Updated Category", result.getCategory());
+        assertEquals("Updated Location", result.getLocation());
+        assertEquals(90.0, result.getPrice());
+    }
+
+    @Test
     void toResponseDTO_mapsEventToDto() {
         Event event = new Event();
         event.setId("event1");
@@ -405,5 +432,27 @@ class EventServiceTest {
         assertThrows(IllegalArgumentException.class, () -> {
             eventService.cancelEvent("nonexistent");
         });
+    }
+
+    @Test
+    void cancelEvent_skipsCancellation_whenReservationNotFound() {
+        Event event = new Event();
+        event.setId("event1");
+        event.setName("Test Event");
+        event.setCancelled(false);
+
+        Ticket ticket = new Ticket("missingReservation", "event1", 50.0);
+        ticket.setId("ticket1");
+
+        when(eventRepository.findById("event1")).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(ticketRepository.findByEventId("event1")).thenReturn(List.of(ticket));
+        when(reservationRepository.findById("missingReservation")).thenReturn(Optional.empty());
+
+        Event result = eventService.cancelEvent("event1");
+
+        assertTrue(result.isCancelled());
+        verify(reservationRepository, never()).save(any(Reservation.class));
+        verify(notificationService, never()).sendEventCancelledNotification(anyString(), any(Event.class));
     }
 }
