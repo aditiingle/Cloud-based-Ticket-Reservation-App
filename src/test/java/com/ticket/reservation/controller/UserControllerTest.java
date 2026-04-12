@@ -2,6 +2,9 @@ package com.ticket.reservation.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import com.ticket.reservation.dto.UserRegistrationRequestDTO;
+import com.ticket.reservation.dto.UserRegistrationResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +36,48 @@ class UserControllerTest {
     void setUp() {
         testUser = new User("Test User", "test@email.com", "1234567890", "hashedPassword");
         testUser.setId("user123");
+    }
+
+    @Test
+    void createUser_success() {
+        UserRegistrationRequestDTO request = new UserRegistrationRequestDTO();
+        request.setName("User");
+        request.setEmail("user@email.com");
+        request.setPhone("1234567890");
+        request.setPassword("password123");
+
+        User savedUser = new User("User", "user@email.com", "1234567890", "hashedPassword");
+        savedUser.setId("user789");
+
+        when(userService.createUser(org.mockito.ArgumentMatchers.any(User.class))).thenReturn(savedUser);
+
+        ResponseEntity<UserRegistrationResponseDTO> response = userController.createUser(request);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        UserRegistrationResponseDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals("user789", body.getId());
+        assertEquals("User", body.getName());
+        assertEquals("user@email.com", body.getEmail());
+        assertEquals("1234567890", body.getPhone());
+    }
+
+    @Test
+    void createUser_duplicateEmail_throwsIllegalArgumentException() {
+        UserRegistrationRequestDTO request = new UserRegistrationRequestDTO();
+        request.setName("User");
+        request.setEmail("user@email.com");
+        request.setPhone("1234567890");
+        request.setPassword("password123");
+
+        when(userService.createUser(org.mockito.ArgumentMatchers.any(User.class)))
+                .thenThrow(new IllegalArgumentException("Email already registered."));
+
+        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> userController.createUser(request));
+
+        assertEquals("Email already registered.", exception.getMessage());
     }
 
     // ==================== Login Endpoint Tests ====================
@@ -111,5 +156,29 @@ class UserControllerTest {
                 () -> userController.login(request));
 
         assertEquals("Invalid password.", exception.getMessage());
+    }
+
+    @Test
+    void getCurrentUser_success() {
+        when(userService.getUserByEmail("test@email.com")).thenReturn(testUser);
+
+        ResponseEntity<UserRegistrationResponseDTO> response = userController.getCurrentUser("test@email.com");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        UserRegistrationResponseDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals("user123", body.getId());
+        assertEquals("Test User", body.getName());
+        assertEquals("test@email.com", body.getEmail());
+        assertEquals("1234567890", body.getPhone());
+    }
+
+    @Test
+    void getCurrentUser_notAuthenticated_throwsAuthenticationException() {
+        AuthenticationException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                AuthenticationException.class,
+                () -> userController.getCurrentUser(null));
+
+        assertEquals("User not authenticated", exception.getMessage());
     }
 }

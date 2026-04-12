@@ -52,6 +52,26 @@ class NotificationServiceTest {
     }
 
     @Test
+    void save_doesNotOverrideSentAt_whenAlreadyPresent() {
+        LocalDateTime existingTime = LocalDateTime.of(2026, 1, 1, 10, 0);
+
+        Notification notification = new Notification();
+        notification.setReservationId("res123");
+        notification.setMessage("Test notification");
+        notification.setType("BOOKING_CONFIRMATION");
+        notification.setSentAt(existingTime);
+
+        when(notificationRepository.save(any(Notification.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Notification saved = notificationService.save(notification);
+
+        assertNotNull(saved);
+        assertEquals(existingTime, saved.getSentAt());
+        verify(notificationRepository, times(1)).save(notification);
+    }
+
+    @Test
     void getNotificationsByReservationId_returnsMatchingNotifications() {
         Notification notification = new Notification(
                 "res123",
@@ -220,5 +240,63 @@ class NotificationServiceTest {
         boolean result = notificationService.sendSMS(user, notification);
 
         assertFalse(result);
+    }
+    @Test
+    void sendEmail_returnsFalse_whenUserIsNull() {
+        Notification notification = new Notification(
+                "res1",
+                "message",
+                LocalDateTime.now(),
+                "TYPE"
+        );
+
+        boolean result = notificationService.sendEmail(null, notification);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void sendEmail_returnsFalse_whenEmailIsBlank() {
+        User user = new User("User", "   ", "1234567890", "pw");
+        Notification notification = new Notification(
+                "res1",
+                "message",
+                LocalDateTime.now(),
+                "TYPE"
+        );
+
+        boolean result = notificationService.sendEmail(user, notification);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void sendSMS_returnsFalse_whenPhoneIsBlank() {
+        User user = new User("User", "user@email.com", "   ", "pw");
+        Notification notification = new Notification(
+                "res1",
+                "message",
+                LocalDateTime.now(),
+                "TYPE"
+        );
+
+        boolean result = notificationService.sendSMS(user, notification);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void sendEventUpdateNotification_usesFallbackValues_whenEventFieldsAreNull() {
+        Event event = new Event();
+
+        when(notificationRepository.save(any(Notification.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Notification result = notificationService.sendEventUpdateNotification("res1", event);
+
+        assertNotNull(result);
+        assertEquals("EVENT_UPDATE", result.getType());
+        assertTrue(result.getMessage().contains("Unknown event"));
+        assertTrue(result.getMessage().contains("TBD"));
     }
 }
