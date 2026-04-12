@@ -1,5 +1,6 @@
 package com.ticket.reservation;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,19 @@ import java.util.List;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private final List<Event> events;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Event event);
+    }
 
     public EventAdapter(List<Event> events) {
         this.events = events;
+    }
+
+    public EventAdapter(List<Event> events, OnItemClickListener listener) {
+        this.events = events;
+        this.listener = listener;
     }
 
     @NonNull
@@ -37,6 +48,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.tvEventLocation.setText(event.getLocation());
         holder.tvEventDateTime.setText(event.getDateTime());
         holder.tvEventPrice.setText("$" + event.getPrice());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(event);
+            } else {
+                Intent intent = new Intent(v.getContext(), EventDetailActivity.class);
+                intent.putExtra("EVENT_ID", event.getId());
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
