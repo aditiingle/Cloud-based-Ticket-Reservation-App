@@ -40,6 +40,8 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/events/**").hasRole("ADMIN")
                         // Event read operations - authenticated users
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/events/**").authenticated()
+                        // Reservation management - accessible by both CUSTOMER and ADMIN
+                        .requestMatchers("/api/reservations/**").hasAnyRole("CUSTOMER", "ADMIN")
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
