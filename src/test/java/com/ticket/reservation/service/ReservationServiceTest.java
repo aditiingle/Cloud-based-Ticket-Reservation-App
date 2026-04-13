@@ -74,7 +74,6 @@ class ReservationServiceTest {
         Mockito.when(userRepository.findById("customer1")).thenReturn(Optional.of(user));
         Mockito.when(eventRepository.findById("event1")).thenReturn(Optional.of(event));
         Mockito.when(reservationRepository.save(Mockito.any(Reservation.class))).thenReturn(savedReservation);
-        Mockito.when(notificationService.sendBookingConfirmation("reservation1", event)).thenReturn(notification);
 
         // Act
         Reservation result = service.createReservation("customer1", "event1");
@@ -86,9 +85,7 @@ class ReservationServiceTest {
         assertEquals("ACTIVE", result.getStatus());
 
         Mockito.verify(ticketRepository).save(Mockito.any(Ticket.class));
-        Mockito.verify(notificationService).sendBookingConfirmation("reservation1", event);
-        Mockito.verify(notificationService).sendEmail(user, notification);
-        Mockito.verify(notificationService).sendSMS(user, notification);
+        Mockito.verify(notificationService).sendBookingConfirmationAsync("reservation1", event, user);
     }
 
     @Test
@@ -181,7 +178,6 @@ class ReservationServiceTest {
         Mockito.when(ticketRepository.findByReservationId("reservation1")).thenReturn(Optional.of(ticket));
         Mockito.when(eventRepository.findById("event1")).thenReturn(Optional.of(event));
         Mockito.when(userRepository.findById("customer1")).thenReturn(Optional.of(user));
-        Mockito.when(notificationService.sendCancellationNotification("reservation1", event)).thenReturn(notification);
 
         // Act
         Reservation result = service.cancelReservation("customer1", "reservation1");
@@ -190,9 +186,7 @@ class ReservationServiceTest {
         assertNotNull(result);
         assertEquals("CANCELLED", result.getStatus());
 
-        Mockito.verify(notificationService).sendCancellationNotification("reservation1", event);
-        Mockito.verify(notificationService).sendEmail(user, notification);
-        Mockito.verify(notificationService).sendSMS(user, notification);
+        Mockito.verify(notificationService).sendCancellationNotificationAsync("reservation1", event, user);
     }
 
     @Test

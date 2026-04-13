@@ -7,8 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.ticket.reservation.model.User;
 import com.ticket.reservation.service.UserService;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
+@EnableAsync
 public class ReservationApplication implements CommandLineRunner {
 
     @Autowired
