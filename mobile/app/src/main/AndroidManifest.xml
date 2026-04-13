@@ -27,7 +27,11 @@
         <!-- Other screens -->
         <activity android:name=".RegisterActivity" />
         <activity android:name=".EventListActivity" />
-
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".MyTicketsActivity" />
+        <activity android:name=".EventDetailActivity" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".AddEditEventActivity" />
 
     </application>
 

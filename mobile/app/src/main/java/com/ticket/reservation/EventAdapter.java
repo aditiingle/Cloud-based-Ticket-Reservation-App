@@ -1,8 +1,10 @@
 package com.ticket.reservation;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,12 +14,24 @@ import com.ticket.reservation.model.Event;
 
 import java.util.List;
 
+import com.squareup.picasso.Picasso;
+
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private final List<Event> events;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Event event);
+    }
 
     public EventAdapter(List<Event> events) {
         this.events = events;
+    }
+
+    public EventAdapter(List<Event> events, OnItemClickListener listener) {
+        this.events = events;
+        this.listener = listener;
     }
 
     @NonNull
@@ -37,6 +51,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.tvEventLocation.setText(event.getLocation());
         holder.tvEventDateTime.setText(event.getDateTime());
         holder.tvEventPrice.setText("$" + event.getPrice());
+
+        String category = event.getCategory() != null ? event.getCategory().toLowerCase() : "event";
+        String imageUrl = "https://loremflickr.com/800/400/" + category + "?lock=" + Math.abs(event.getId().hashCode());
+
+        Picasso.get()
+                .load(imageUrl)
+                .fit()
+                .centerCrop()
+                .into(holder.ivEventImage);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(event);
+            } else {
+                Intent intent = new Intent(v.getContext(), EventDetailActivity.class);
+                intent.putExtra("EVENT_ID", event.getId());
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -50,6 +83,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView tvEventLocation;
         TextView tvEventDateTime;
         TextView tvEventPrice;
+        ImageView ivEventImage;
 
         EventViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -58,6 +92,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             tvEventLocation = itemView.findViewById(R.id.tvEventLocation);
             tvEventDateTime = itemView.findViewById(R.id.tvEventDateTime);
             tvEventPrice = itemView.findViewById(R.id.tvEventPrice);
+            ivEventImage = itemView.findViewById(R.id.ivEventImage);
         }
     }
 }

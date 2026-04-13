@@ -21,7 +21,6 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText etEmail;
     private EditText etPhone;
     private EditText etPassword;
-    private EditText etConfirmPassword;
     private Button btnRegister;
     private TextView tvGoToLogin;
 
@@ -36,7 +35,6 @@ public class RegisterActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         etPassword = findViewById(R.id.etPassword);
-        etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnRegister = findViewById(R.id.btnRegister);
         tvGoToLogin = findViewById(R.id.tvGoToLogin);
 
@@ -56,7 +54,6 @@ public class RegisterActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String password = etPassword.getText().toString();
-        String confirmPassword = etConfirmPassword.getText().toString();
 
         if (name.isEmpty()) {
             Toast.makeText(this, "Name is required", Toast.LENGTH_SHORT).show();
@@ -70,11 +67,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (password.isEmpty()) {
             Toast.makeText(this, "Password is required", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
             return;
         }
 

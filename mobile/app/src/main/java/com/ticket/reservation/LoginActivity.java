@@ -28,6 +28,18 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize SessionManager with context
+        SessionManager sessionManager = SessionManager.getInstance(this);
+
+        // Check if user is already logged in
+        if (sessionManager.isLoggedIn()) {
+            Intent intent = new Intent(LoginActivity.this, EventListActivity.class);
+            startActivity(intent);
+            finish();
+            return; // Skip setting up login UI
+        }
+
         setContentView(R.layout.activity_login);
 
         etIdentifier = findViewById(R.id.etIdentifier);
@@ -61,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String token = response.body().getToken();
-                    SessionManager.getInstance().saveToken(token);
+                    SessionManager.getInstance(LoginActivity.this).saveToken(token);
 
                     Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
 

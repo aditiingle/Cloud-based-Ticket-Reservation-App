@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <!-- Header Image -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="#D1D5DB">
+
+                <ImageView
+                    android:id="@+id/ivEventImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
+
+                <!-- Back Button placeholder -->
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="48dp"
+                    android:background="@drawable/bg_avatar"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    app:tint="#161C2D" />
+            </FrameLayout>
+
+            <!-- Content Container -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp"
+                android:layout_marginTop="-30dp"
+                android:background="@drawable/bg_bottom_sheet_rounded">
+
+                <TextView
+                    android:id="@+id/tvCategoryTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SPORTS"
+                    android:textColor="#5A55EE"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_avatar"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- Price is at the bottom according to java code, but visually it's also at top right. We'll put it at top right and bottom as total -->
+                <TextView
+                    android:id="@+id/tvTopPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$450"
+                    android:textColor="#5A55EE"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvEventName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Super Bowl LX"
+                    android:textColor="#161C2D"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvCategoryTag"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/llDateLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:baselineAligned="false"
+                    app:layout_constraintTop_toBottomOf="@id/tvEventName">
+
+                    <TextView
+                        android:id="@+id/tvEventDateTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Feb 7"
+                        android:textColor="#161C2D"
+                        android:textSize="14sp"
+                        android:background="@drawable/bg_category"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="12dp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvEventLocation"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Santa Clara"
+                        android:textColor="#161C2D"
+                        android:textSize="14sp"
+                        android:background="@drawable/bg_category"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="12dp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvAboutLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="About"
+                    android:textColor="#161C2D"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/llDateLocation"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvEventDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="The ultimate football championship game."
+                    android:textColor="#6E7381"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvAboutLabel" />
+
+                <!-- Select Quantity disabled as per backend constraints -->
+                <TextView
+                    android:id="@+id/tvQuantityLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Quantity"
+                    android:textColor="#161C2D"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="24dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/tvEventDescription"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/llQuantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_category"
+                    android:layout_marginTop="12dp"
+                    android:padding="4dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/tvQuantityLabel"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="-"
+                        android:gravity="center"
+                        android:textColor="#6E7381"
+                        android:textSize="18sp" />
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="1"
+                        android:gravity="center"
+                        android:textColor="#161C2D"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="+"
+                        android:gravity="center"
+                        android:textColor="#5A55EE"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvTicketsRemaining"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reservations are limited to one ticket per transaction."
+                    android:textColor="#9B9EAC"
+                    android:textSize="12sp"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvEventDescription"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Action Bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="24dp"
+        android:elevation="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tvTotalLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total Price"
+            android:textColor="#6E7381"
+            android:textSize="12sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tvEventPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$450"
+            android:textColor="#161C2D"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/tvTotalLabel"
+            app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnEditEvent"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_button"
+                android:backgroundTint="#FFC107"
+                android:text="Edit Event"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnCancelEvent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCancelEvent"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_button"
+                android:backgroundTint="#D32F2F"
+                android:text="Cancel Event"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnEditEvent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBookTicket"
+                android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="32dp"
+            android:background="@drawable/bg_rounded_button"
+            android:text="Book Ticket"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tvEventPrice"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,7 @@
 package com.ticket.reservation.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Event {
     private String id;
     private String name;
@@ -8,6 +10,7 @@ public class Event {
     private String location;
     private String dateTime;
     private double price;
+    @SerializedName("cancelled")
     private boolean isCancelled;
 
     public String getId() { return id; }
