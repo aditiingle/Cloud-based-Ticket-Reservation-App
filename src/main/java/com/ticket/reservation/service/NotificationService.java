@@ -132,17 +132,25 @@ public class NotificationService {
 
     @Async
     public CompletableFuture<Void> sendBookingConfirmationAsync(String reservationId, Event event, User user) {
-        Notification notification = sendBookingConfirmation(reservationId, event);
-        sendEmail(user, notification);
-        sendSMS(user, notification);
-        return CompletableFuture.completedFuture(null);
+        try {
+            Notification notification = sendBookingConfirmation(reservationId, event);
+            sendEmail(user, notification);
+            sendSMS(user, notification);
+            return CompletableFuture.completedFuture(null);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
     }
 
     @Async
     public CompletableFuture<Void> sendCancellationNotificationAsync(String reservationId, Event event, User user) {
-        Notification notification = sendCancellationNotification(reservationId, event);
-        sendEmail(user, notification);
-        sendSMS(user, notification);
-        return CompletableFuture.completedFuture(null);
+        try {
+            Notification notification = sendCancellationNotification(reservationId, event);
+            sendEmail(user, notification);
+            sendSMS(user, notification);
+            return CompletableFuture.completedFuture(null);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
     }
 }
