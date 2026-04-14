@@ -31,7 +31,15 @@ Our objective is to develop a user-friendly reservation platform that simplifies
 4. Automated notifications and confirmations. The system provides real-time feedback and sends confirmations for reservations and cancellations.
 
 ## Languages & Techniques
-TBD
+- Backend: Java with Spring Boot, developed using IntelliJ IDEA
+- Frontend: Android application developed in Java using Android Studio, with XML-based layouts 
+- Database: MongoDB used as a cloud-hosted NoSQL database
+- Deployment: Deployed using Railway cloud platform
+
 
 ## Run the Project
-TBD
+- Clone the repo
+- Open the project from root on IntelliJ IDE, and run
+- Open the project's mobile/ folder on Android Studio, and run with an emulator
+- Customer functionality - you can login as customer by registering
+- Admin login - Username: admin@dafan.com | Password: admin
