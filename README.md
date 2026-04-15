@@ -44,3 +44,4 @@ Our objective is to develop a user-friendly reservation platform that simplifies
 - Customer functionality - you can login as customer by registering
 - Admin login - Username: admin@dafan.com | Password: admin
 - If creating a user doesn't work, it might be because the phone number is already registered under another account
+- Customer login - Username: test@email.com | Password: password123
